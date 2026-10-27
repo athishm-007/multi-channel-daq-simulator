@@ -44,23 +44,7 @@ Files created next to where you run it: `daq_log.csv` (the log) and `daq_state.p
   `ChannelControl` and shown in red.
 - **Collections:** `PriorityQueue`, `LinkedHashMap`, `ArrayList`, `ArrayDeque`, `ObservableList`, `Properties`.
 
-## System Architecture & UI Preview
-
-### Real-Time JavaFX Acquisition Dashboard
-![Dashboard Preview](slide10_screenshot1_normal_case.png)
-
-### Module Architecture Block Diagram
-![Architecture Block Diagram](slide4_module_block_diagram.png)
-
-### UML Class Hierarchy
-![UML Class Diagram](slide6_uml_class_diagram.png)
-
-## Documentation & Academic Deliverables
-- **[Full Project Report](PROJECT_REPORT_711525BEC014.md)**: Comprehensive engineering report covering requirements, design patterns, threading architecture, and test cases.
-- **[Presentation Slide Content](PPT_PRESENTATION_CONTENT.md)**: Complete slide-by-slide script and breakdown.
-- **[Viva Voce Preparation Guide](VIVA_VOCE_PREPARATION.md)**: Detailed technical Q&A covering threading, JavaFX, OOP, and data structures.
-
-## Demo script for the examiner
+## Demo script
 1. Launch, press **Start**: rows appear interleaved from four channels, # column and Elapsed increase together.
 2. Change Vibration to 50 and Apply: it speeds up live. Type 500: red error from `InvalidRateException`.
 3. Untick Pressure: it pauses. Use **Show:** to filter one channel.
