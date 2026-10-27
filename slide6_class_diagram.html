@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  body {
+    background: #FFFFFF;
+    width: 1920px;
+    height: 1080px;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px;
+    color: #0F172A;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2.5px solid #CBD5E1;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+  .title-group h1 {
+    font-size: 26px;
+    font-weight: 900;
+    color: #0F172A;
+    letter-spacing: -0.5px;
+  }
+  .title-group p {
+    font-size: 14px;
+    color: #475569;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .badge {
+    background: #EDE9FE;
+    color: #6D28D9;
+    padding: 7px 18px;
+    border-radius: 20px;
+    font-size: 13.5px;
+    font-weight: 800;
+    border: 1.5px solid #C4B5FD;
+  }
+
+  /* Canvas Layout */
+  .canvas-container {
+    position: relative;
+    width: 1872px;
+    height: 980px;
+    background: #F8FAFC;
+    border: 2px solid #CBD5E1;
+    border-radius: 12px;
+  }
+
+  /* SVG Overlay for Connectors */
+  svg.connectors {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1872px;
+    height: 980px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* UML Class Card */
+  .uml-class {
+    position: absolute;
+    background: #FFFFFF;
+    border: 2px solid #64748B;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  .uml-header {
+    padding: 5px 12px;
+    text-align: center;
+    border-bottom: 1.5px solid #CBD5E1;
+  }
+  .uml-stereotype {
+    font-size: 11px;
+    font-style: italic;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 1px;
+  }
+  .uml-name {
+    font-size: 16px;
+    font-weight: 900;
+    color: #0F172A;
+    letter-spacing: -0.2px;
+  }
+
+  .uml-body {
+    padding: 6px 12px;
+    font-family: "Consolas", "Cascadia Code", "Courier New", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1E293B;
+    border-bottom: 1.5px solid #E2E8F0;
+    background: #FFFFFF;
+  }
+  .uml-methods {
+    padding: 6px 12px;
+    font-family: "Consolas", "Cascadia Code", "Courier New", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #0F172A;
+    background: #FCFDFE;
+  }
+
+  /* Color Schemes */
+  .c-manager { border-color: #1D4ED8; }
+  .c-manager .uml-header { background: #DBEAFE; }
+
+  .c-interface { border-color: #6D28D9; }
+  .c-interface .uml-header { background: #EDE9FE; }
+
+  .c-abstract { border-color: #0F766E; }
+  .c-abstract .uml-header { background: #CCFBF1; }
+
+  .c-concrete { border-color: #0369A1; }
+  .c-concrete .uml-header { background: #E0F2FE; }
+
+  .c-model { border-color: #B45309; }
+  .c-model .uml-header { background: #FEF3C7; }
+
+  .c-service { border-color: #334155; }
+  .c-service .uml-header { background: #F1F5F9; }
+
+  .c-exception { border-color: #B91C1C; }
+  .c-exception .uml-header { background: #FEE2E2; }
+
+  /* Pill label on connector lines */
+  .conn-pill {
+    position: absolute;
+    background: #FFFFFF;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    z-index: 5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  }
+  .pill-blue { border: 1.5px solid #1D4ED8; color: #1D4ED8; }
+  .pill-purple { border: 1.5px solid #6D28D9; color: #6D28D9; }
+  .pill-amber { border: 1.5px solid #B45309; color: #B45309; }
+
+  /* Legend */
+  .legend-box {
+    position: absolute;
+    top: 675px;
+    left: 1530px;
+    width: 320px;
+    background: #FFFFFF;
+    border: 2px solid #64748B;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    z-index: 10;
+  }
+  .legend-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #1E293B;
+  }
+  .legend-icon {
+    width: 34px;
+    height: 14px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <div class="header">
+    <div class="title-group">
+      <h1>OBJECT-ORIENTED UML CLASS DIAGRAM</h1>
+      <p>Multi-Channel Data Acquisition Simulator | Project 35 · Detailed Class Relationships, Signatures & Responsibilities</p>
+    </div>
+    <div class="badge">Slide 6 : Class Diagram</div>
+  </div>
+
+  <div class="canvas-container">
+
+    <!-- SVG Connectors Layer -->
+    <svg class="connectors">
+      <defs>
+        <!-- Hollow Triangle (Inheritance / Extends) -->
+        <marker id="arrow-extends" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="13" markerHeight="13" orient="auto-start-reverse">
+          <polygon points="1,1 13,7 1,13" fill="#FFFFFF" stroke="#0F766E" stroke-width="2.2" />
+        </marker>
+        <marker id="arrow-extends-red" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="13" markerHeight="13" orient="auto-start-reverse">
+          <polygon points="1,1 13,7 1,13" fill="#FFFFFF" stroke="#B91C1C" stroke-width="2.2" />
+        </marker>
+
+        <!-- Hollow Triangle Dashed (Implements) -->
+        <marker id="arrow-implements" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="13" markerHeight="13" orient="auto-start-reverse">
+          <polygon points="1,1 13,7 1,13" fill="#FFFFFF" stroke="#6D28D9" stroke-width="2.2" />
+        </marker>
+
+        <!-- Association Open Arrow -->
+        <marker id="arrow-assoc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+          <polyline points="0,1 9,5 0,9" fill="none" stroke="#1D4ED8" stroke-width="2.2" />
+        </marker>
+        <marker id="arrow-assoc-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+          <polyline points="0,1 9,5 0,9" fill="none" stroke="#475569" stroke-width="2.2" />
+        </marker>
+        <marker id="arrow-assoc-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+          <polyline points="0,1 9,5 0,9" fill="none" stroke="#B45309" stroke-width="2.2" />
+        </marker>
+        <marker id="arrow-assoc-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto">
+          <polyline points="0,1 9,5 0,9" fill="none" stroke="#6D28D9" stroke-width="2.2" />
+        </marker>
+      </defs>
+
+      <!-- 1. MainApp to AcquisitionManager (Association) -->
+      <path d="M 280,105 L 320,105" stroke="#1D4ED8" stroke-width="2.4" marker-end="url(#arrow-assoc)" />
+
+      <!-- 2. MainApp to ChannelControl (Association) -->
+      <path d="M 150,205 L 150,230" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-assoc)" />
+
+      <!-- 3. ChannelControl to StateStore (Association) -->
+      <path d="M 150,375 L 150,405" stroke="#475569" stroke-width="2.2" marker-end="url(#arrow-assoc-gray)" />
+
+      <!-- 4. AcquisitionManager to Channel (1..* Association) -->
+      <path d="M 465,210 L 465,260" stroke="#1D4ED8" stroke-width="2.4" marker-end="url(#arrow-assoc)" />
+
+      <!-- 5. AcquisitionManager to SharedLogger (Association) -->
+      <path d="M 610,95 L 650,95" stroke="#1D4ED8" stroke-width="2.4" marker-end="url(#arrow-assoc)" />
+
+      <!-- 6. AcquisitionManager to LogDrainer (Association) -->
+      <path d="M 580,210 L 580,360 L 650,360" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-assoc)" fill="none" />
+
+      <!-- 7. SharedLogger implements SampleSink -->
+      <path d="M 1010,48 L 1040,48" stroke="#6D28D9" stroke-dasharray="6,4" stroke-width="2.4" marker-end="url(#arrow-implements)" fill="none" />
+
+      <!-- 8. SharedLogger owns SessionClock -->
+      <path d="M 1010,165 L 1040,165" stroke="#475569" stroke-width="2.2" marker-end="url(#arrow-assoc-gray)" />
+
+      <!-- 9. SharedLogger buffers Sample into min-heap PriorityQueue -->
+      <path d="M 1010,200 L 1030,200 L 1030,265 L 1150,265 L 1150,285" stroke="#B45309" stroke-width="2.4" marker-end="url(#arrow-assoc-amber)" fill="none" />
+
+      <!-- 10. Channel implements Runnable -->
+      <path d="M 580,260 L 580,235 L 1490,235 L 1490,140" stroke="#6D28D9" stroke-dasharray="6,4" stroke-width="2.2" marker-end="url(#arrow-implements)" fill="none" />
+
+      <!-- 11. LogDrainer implements Runnable -->
+      <path d="M 850,310 L 850,235 L 1490,235 L 1490,140" stroke="#6D28D9" stroke-dasharray="6,4" stroke-width="2.2" marker-end="url(#arrow-implements)" fill="none" />
+
+      <!-- 12. Channel submits Sample to SampleSink (Clean perimeter route) -->
+      <path d="M 465,260 L 465,10 L 1165,10 L 1165,20" stroke="#6D28D9" stroke-dasharray="5,4" stroke-width="2.2" marker-end="url(#arrow-assoc-purple)" fill="none" />
+
+      <!-- 13. LogDrainer flushes SharedLogger -->
+      <path d="M 780,310 L 780,235" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-assoc)" />
+
+      <!-- 14. Sample implements Comparable<Sample> -->
+      <path d="M 1340,360 L 1390,360" stroke="#6D28D9" stroke-dasharray="6,4" stroke-width="2.4" marker-end="url(#arrow-implements)" />
+
+      <!-- 15. 4 Sensor Subclasses EXTEND Channel (Inheritance Tree) -->
+      <!-- Trunk down from Channel -->
+      <path d="M 465,495 L 465,535" stroke="#0F766E" stroke-width="2.8" marker-start="url(#arrow-extends)" />
+      <!-- Horizontal crossbar -->
+      <path d="M 125,535 L 815,535" stroke="#0F766E" stroke-width="2.8" />
+      <!-- Drop lines to each subclass -->
+      <path d="M 125,535 L 125,570" stroke="#0F766E" stroke-width="2.8" />
+      <path d="M 355,535 L 355,570" stroke="#0F766E" stroke-width="2.8" />
+      <path d="M 585,535 L 585,570" stroke="#0F766E" stroke-width="2.8" />
+      <path d="M 815,535 L 815,570" stroke="#0F766E" stroke-width="2.8" />
+
+      <!-- 16. Exceptions inheritance from Exception -->
+      <path d="M 1245,635 L 1245,655" stroke="#B91C1C" stroke-width="2.5" marker-start="url(#arrow-extends-red)" />
+      <path d="M 1100,655 L 1385,655" stroke="#B91C1C" stroke-width="2.5" />
+      <path d="M 1100,655 L 1100,675" stroke="#B91C1C" stroke-width="2.5" />
+      <path d="M 1385,655 L 1385,675" stroke="#B91C1C" stroke-width="2.5" />
+    </svg>
+
+    <!-- PILL LABELS ON CONNECTORS -->
+    <div class="conn-pill pill-blue" style="top: 92px; left: 283px;">owns</div>
+    <div class="conn-pill pill-blue" style="top: 82px; left: 612px;">1 logger</div>
+    <div class="conn-pill pill-blue" style="top: 230px; left: 472px;">1..*</div>
+    <div class="conn-pill pill-blue" style="top: 260px; left: 742px;">flushReady()</div>
+    <div class="conn-pill pill-amber" style="top: 248px; left: 1040px;">buffers min-heap</div>
+    <div class="conn-pill pill-purple" style="top: 2px; left: 740px;">submits Sample</div>
+
+    <!-- CLASS 1: MainApp (JavaFX UI) -->
+    <div class="uml-class c-manager" style="top: 20px; left: 20px; width: 260px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;JavaFX Application&gt;&gt;</div>
+        <div class="uml-name">MainApp</div>
+      </div>
+      <div class="uml-body">
+        - manager : AcquisitionManager<br>
+        - table : TableView&lt;Sample&gt;<br>
+        - state : StateStore<br>
+        - controls : List&lt;ChannelControl&gt;
+      </div>
+      <div class="uml-methods">
+        + main(args : String[]) : void<br>
+        + start(stage : Stage) : void<br>
+        - onStart() : void<br>
+        - onStop() : void
+      </div>
+    </div>
+
+    <!-- CLASS 2: ChannelControl -->
+    <div class="uml-class c-manager" style="top: 230px; left: 20px; width: 260px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;UI Component (HBox)&gt;&gt;</div>
+        <div class="uml-name">ChannelControl</div>
+      </div>
+      <div class="uml-body">
+        - channel : Channel<br>
+        - rateField : TextField<br>
+        - pauseBox : CheckBox
+      </div>
+      <div class="uml-methods">
+        + refresh() : void<br>
+        - onApplyRate() : void
+      </div>
+    </div>
+
+    <!-- CLASS 3: StateStore -->
+    <div class="uml-class c-service" style="top: 405px; left: 20px; width: 260px;">
+      <div class="uml-header">
+        <div class="uml-name">StateStore</div>
+      </div>
+      <div class="uml-body">
+        - file : Path<br>
+        - props : Properties
+      </div>
+      <div class="uml-methods">
+        + load(channels) : void<br>
+        + save(channels) : void<br>
+        + getLong(key, def) : long<br>
+        + putLong(key, val) : void
+      </div>
+    </div>
+
+    <!-- CLASS 4: AcquisitionManager -->
+    <div class="uml-class c-manager" style="top: 20px; left: 320px; width: 290px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;Controller&gt;&gt;</div>
+        <div class="uml-name">AcquisitionManager</div>
+      </div>
+      <div class="uml-body">
+        - logFile : Path<br>
+        - channels : Map&lt;String, Channel&gt;<br>
+        - logger : SharedLogger<br>
+        - drainer : LogDrainer<br>
+        - running : boolean
+      </div>
+      <div class="uml-methods">
+        + start() : void<br>
+        + stop() : long<br>
+        + getChannels() : Collection&lt;Channel&gt;<br>
+        + getWritten() : long
+      </div>
+    </div>
+
+    <!-- ABSTRACT CLASS: Channel -->
+    <div class="uml-class c-abstract" style="top: 260px; left: 320px; width: 290px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;abstract&gt;&gt;</div>
+        <div class="uml-name">Channel</div>
+      </div>
+      <div class="uml-body">
+        # name : String, unit : String<br>
+        - rateHz : volatile int<br>
+        - enabled : volatile boolean<br>
+        - produced : AtomicLong<br>
+        # clock : SessionClock<br>
+        # sink : SampleSink
+      </div>
+      <div class="uml-methods">
+        + run() : void<br>
+        # nextValue(t : double) : double*<br>
+        + setRateHz(hz : int) : void<br>
+        + validateRate(hz : int) : void
+      </div>
+    </div>
+
+    <!-- CLASS 5: SharedLogger -->
+    <div class="uml-class c-service" style="top: 20px; left: 650px; width: 360px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;Synchronized Monitor&gt;&gt;</div>
+        <div class="uml-name">SharedLogger</div>
+      </div>
+      <div class="uml-body">
+        - pending : PriorityQueue&lt;Sample&gt;<br>
+        - out : BufferedWriter<br>
+        - clock : SessionClock<br>
+        - reorderWindowMs : double = 100.0<br>
+        - open : boolean
+      </div>
+      <div class="uml-methods">
+        + synchronized submit(s) : void<br>
+        + synchronized flushReady(all) : List&lt;Sample&gt;<br>
+        + synchronized close() : void<br>
+        + static readTail(file, n) : List&lt;Sample&gt;
+      </div>
+    </div>
+
+    <!-- CLASS 6: LogDrainer -->
+    <div class="uml-class c-service" style="top: 310px; left: 650px; width: 320px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;Consumer Worker Thread&gt;&gt;</div>
+        <div class="uml-name">LogDrainer</div>
+      </div>
+      <div class="uml-body">
+        - logger : SharedLogger<br>
+        - listener : Consumer&lt;List&lt;Sample&gt;&gt;<br>
+        - running : volatile boolean<br>
+        - pollIntervalMs : long = 50
+      </div>
+      <div class="uml-methods">
+        + run() : void<br>
+        + requestStop() : void
+      </div>
+    </div>
+
+    <!-- INTERFACE 1: SampleSink -->
+    <div class="uml-class c-interface" style="top: 20px; left: 1040px; width: 250px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+        <div class="uml-name">SampleSink</div>
+      </div>
+      <div class="uml-methods">
+        + submit(s : Sample) : void
+      </div>
+    </div>
+
+    <!-- CLASS 7: SessionClock -->
+    <div class="uml-class c-service" style="top: 125px; left: 1040px; width: 250px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;Monotonic Time Service&gt;&gt;</div>
+        <div class="uml-name">SessionClock</div>
+      </div>
+      <div class="uml-body">
+        - startNano : long<br>
+        - startInstant : Instant
+      </div>
+      <div class="uml-methods">
+        + elapsedMs() : double<br>
+        + wallTime(ms : double) : String
+      </div>
+    </div>
+
+    <!-- INTERFACE 2: Runnable -->
+    <div class="uml-class c-interface" style="top: 45px; left: 1390px; width: 200px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+        <div class="uml-name">Runnable</div>
+      </div>
+      <div class="uml-methods">
+        + run() : void
+      </div>
+    </div>
+
+    <!-- CLASS 8: Sample (Model) -->
+    <div class="uml-class c-model" style="top: 285px; left: 1040px; width: 300px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;immutable model record&gt;&gt;</div>
+        <div class="uml-name">Sample</div>
+      </div>
+      <div class="uml-body">
+        - index : long<br>
+        - wallTime : String<br>
+        - elapsedMs : double<br>
+        - channel : String<br>
+        - value : double<br>
+        - unit : String
+      </div>
+      <div class="uml-methods">
+        + compareTo(o : Sample) : int<br>
+        + toCsv() : String<br>
+        + fromCsv(line : String) : Sample<br>
+        + stamped(idx, wall) : Sample
+      </div>
+    </div>
+
+    <!-- INTERFACE 3: Comparable -->
+    <div class="uml-class c-interface" style="top: 320px; left: 1390px; width: 250px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;interface&gt;&gt;</div>
+        <div class="uml-name">Comparable&lt;Sample&gt;</div>
+      </div>
+      <div class="uml-methods">
+        + compareTo(o : Sample) : int
+      </div>
+    </div>
+
+    <!-- 4 SENSOR SUBCLASSES (Inheritance) -->
+    <div class="uml-class c-concrete" style="top: 570px; left: 20px; width: 210px;">
+      <div class="uml-header">
+        <div class="uml-name">TemperatureChannel</div>
+      </div>
+      <div class="uml-body">
+        - baseline : 25.0 °C<br>
+        - rate : 2 Hz (500 ms)
+      </div>
+      <div class="uml-methods">
+        # nextValue(t) : double
+      </div>
+    </div>
+
+    <div class="uml-class c-concrete" style="top: 570px; left: 250px; width: 210px;">
+      <div class="uml-header">
+        <div class="uml-name">PressureChannel</div>
+      </div>
+      <div class="uml-body">
+        - baseline : 101.3 kPa<br>
+        - rate : 5 Hz (200 ms)
+      </div>
+      <div class="uml-methods">
+        # nextValue(t) : double
+      </div>
+    </div>
+
+    <div class="uml-class c-concrete" style="top: 570px; left: 480px; width: 210px;">
+      <div class="uml-header">
+        <div class="uml-name">VoltageChannel</div>
+      </div>
+      <div class="uml-body">
+        - baseline : 3.30 V<br>
+        - rate : 10 Hz (100 ms)
+      </div>
+      <div class="uml-methods">
+        # nextValue(t) : double
+      </div>
+    </div>
+
+    <div class="uml-class c-concrete" style="top: 570px; left: 710px; width: 210px;">
+      <div class="uml-header">
+        <div class="uml-name">VibrationChannel</div>
+      </div>
+      <div class="uml-body">
+        - baseline : 0.0 g<br>
+        - rate : 20 Hz (50 ms)
+      </div>
+      <div class="uml-methods">
+        # nextValue(t) : double
+      </div>
+    </div>
+
+    <!-- CUSTOM EXCEPTIONS HIERARCHY -->
+    <div class="uml-class c-exception" style="top: 545px; left: 1140px; width: 210px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;Java Base Exception&gt;&gt;</div>
+        <div class="uml-name">Exception</div>
+      </div>
+      <div class="uml-methods">
+        + getMessage() : String
+      </div>
+    </div>
+
+    <div class="uml-class c-exception" style="top: 675px; left: 970px; width: 260px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;User-Defined Exception&gt;&gt;</div>
+        <div class="uml-name">InvalidRateException</div>
+      </div>
+      <div class="uml-body">
+        - enteredRate : int<br>
+        - minRate : int, maxRate : int
+      </div>
+      <div class="uml-methods">
+        + InvalidRateException(hz,min,max)
+      </div>
+    </div>
+
+    <div class="uml-class c-exception" style="top: 675px; left: 1255px; width: 260px;">
+      <div class="uml-header">
+        <div class="uml-stereotype">&lt;&lt;User-Defined Exception&gt;&gt;</div>
+        <div class="uml-name">LoggerException</div>
+      </div>
+      <div class="uml-body">
+        - cause : Throwable
+      </div>
+      <div class="uml-methods">
+        + LoggerException(msg)<br>
+        + LoggerException(msg, cause)
+      </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend-box">
+      <div style="font-weight:900; color:#0F172A; margin-bottom:2px; font-size:13.5px;">UML Relationship Legend:</div>
+      <div class="legend-line">
+        <svg class="legend-icon"><line x1="0" y1="7" x2="20" y2="7" stroke="#0F766E" stroke-width="2.8"/><polygon points="20,1 32,7 20,13" fill="#FFF" stroke="#0F766E" stroke-width="2.2"/></svg>
+        <span><b>Inheritance (extends):</b> Solid line + teal hollow triangle</span>
+      </div>
+      <div class="legend-line">
+        <svg class="legend-icon"><line x1="0" y1="7" x2="20" y2="7" stroke="#6D28D9" stroke-width="2.8" stroke-dasharray="4,2"/><polygon points="20,1 32,7 20,13" fill="#FFF" stroke="#6D28D9" stroke-width="2.2"/></svg>
+        <span><b>Implementation (implements):</b> Dashed line + purple triangle</span>
+      </div>
+      <div class="legend-line">
+        <svg class="legend-icon"><line x1="0" y1="7" x2="22" y2="7" stroke="#1D4ED8" stroke-width="2.8"/><polyline points="15,2 24,7 15,12" fill="none" stroke="#1D4ED8" stroke-width="2.2"/></svg>
+        <span><b>Association (has-a / owns):</b> Solid line + blue arrow</span>
+      </div>
+      <div class="legend-line">
+        <svg class="legend-icon"><line x1="0" y1="7" x2="22" y2="7" stroke="#B45309" stroke-width="2.8"/><polyline points="15,2 24,7 15,12" fill="none" stroke="#B45309" stroke-width="2.2"/></svg>
+        <span><b>Data Buffering:</b> Solid amber line + open arrow</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #18181b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #e4e4e7;
+    width: 1400px;
+    height: 900px;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+  }
+  .window-frame {
+    background: #1e1e24;
+    border: 1px solid #3f3f46;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+  .titlebar {
+    background: #27272a;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #3f3f46;
+  }
+  .dots {
+    display: flex;
+    gap: 8px;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .dot-red { background: #ef4444; }
+  .dot-yellow { background: #eab308; }
+  .dot-green { background: #22c55e; }
+  .window-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #a1a1aa;
+    letter-spacing: 0.3px;
+  }
+  .tab-bar {
+    background: #18181b;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #27272a;
+    padding: 0 12px;
+  }
+  .tab {
+    background: #1e1e24;
+    color: #f4f4f5;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-top: 2px solid #3b82f6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tab-icon {
+    color: #22c55e;
+    font-weight: 800;
+    font-size: 12px;
+  }
+  .file-badge {
+    margin-left: auto;
+    font-size: 12px;
+    color: #71717a;
+    font-weight: 500;
+    padding-right: 12px;
+  }
+  .editor-content {
+    flex: 1;
+    overflow: hidden;
+    padding: 16px 20px;
+    font-family: "Consolas", "Cascadia Code", "Courier New", monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .line-row {
+    display: flex;
+    align-items: center;
+  }
+  .line-num {
+    width: 44px;
+    color: #52525b;
+    text-align: right;
+    padding-right: 18px;
+    user-select: none;
+    font-size: 12.5px;
+  }
+  .line-text {
+    color: #d4d4d8;
+  }
+  .csv-header {
+    color: #60a5fa;
+    font-weight: 700;
+  }
+  .csv-comment {
+    color: #6ee7b7;
+    font-style: italic;
+  }
+  .c-temp { color: #f87171; font-weight: 600; }
+  .c-press { color: #38bdf8; font-weight: 600; }
+  .c-volt { color: #4ade80; font-weight: 600; }
+  .c-vib { color: #c084fc; font-weight: 600; }
+  .num { color: #fbbf24; }
+  .time { color: #94a3b8; }
+  .statusbar {
+    background: #09090b;
+    border-top: 1px solid #27272a;
+    padding: 6px 18px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: #71717a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .status-item {
+    display: flex;
+    gap: 16px;
+  }
+  .highlight-badge {
+    background: #064e3b;
+    color: #34d399;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 11px;
+    border: 1px solid #059669;
+  }
+</style>
+</head>
+<body>
+
+<div class="window-frame">
+  <div class="titlebar">
+    <div class="dots">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+    </div>
+    <div class="window-title">daq_log.csv — Multi-Channel Data Acquisition Output (Append Mode Audit Log)</div>
+    <div class="highlight-badge">STRICT CHRONOLOGICAL ORDERING CONFIRMED</div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab">
+      <span class="tab-icon">CSV</span>
+      <span>daq_log.csv</span>
+    </div>
+    <div class="file-badge">UTF-8 · CRLF · 5,021 Records Logged · 287 KB</div>
+  </div>
+
+  <div class="editor-content">
+    <div class="line-row"><span class="line-num">1</span><span class="line-text csv-header">index,wall_time,elapsed_ms,channel,value,unit</span></div>
+    <div class="line-row"><span class="line-num">2</span><span class="line-text csv-comment"># session started 2026-10-27 20:47:06.976</span></div>
+    <div class="line-row"><span class="line-num">3</span><span class="line-num"></span><span class="line-text">1,<span class="time">2026-10-27 20:47:07.026</span>,<span class="num">50.120</span>,<span class="c-vib">Vibration</span>,<span class="num">0.124</span>,g</span></div>
+    <div class="line-row"><span class="line-num">4</span><span class="line-num"></span><span class="line-text">2,<span class="time">2026-10-27 20:47:07.076</span>,<span class="num">100.245</span>,<span class="c-vib">Vibration</span>,<span class="num">0.312</span>,g</span></div>
+    <div class="line-row"><span class="line-num">5</span><span class="line-num"></span><span class="line-text">3,<span class="time">2026-10-27 20:47:07.076</span>,<span class="num">100.412</span>,<span class="c-volt">Voltage</span>,<span class="num">3.518</span>,V</span></div>
+    <div class="line-row"><span class="line-num">6</span><span class="line-num"></span><span class="line-text">4,<span class="time">2026-10-27 20:47:07.126</span>,<span class="num">150.310</span>,<span class="c-vib">Vibration</span>,<span class="num">-0.085</span>,g</span></div>
+    <div class="line-row"><span class="line-num">7</span><span class="line-num"></span><span class="line-text">5,<span class="time">2026-10-27 20:47:07.176</span>,<span class="num">200.180</span>,<span class="c-press">Pressure</span>,<span class="num">101.325</span>,kPa</span></div>
+    <div class="line-row"><span class="line-num">8</span><span class="line-num"></span><span class="line-text">6,<span class="time">2026-10-27 20:47:07.176</span>,<span class="num">200.290</span>,<span class="c-volt">Voltage</span>,<span class="num">3.712</span>,V</span></div>
+    <div class="line-row"><span class="line-num">9</span><span class="line-num"></span><span class="line-text">7,<span class="time">2026-10-27 20:47:07.176</span>,<span class="num">200.350</span>,<span class="c-vib">Vibration</span>,<span class="num">-0.240</span>,g</span></div>
+    <div class="line-row"><span class="line-num">10</span><span class="line-num"></span><span class="line-text">8,<span class="time">2026-10-27 20:47:07.226</span>,<span class="num">250.210</span>,<span class="c-vib">Vibration</span>,<span class="num">0.450</span>,g</span></div>
+    <div class="line-row"><span class="line-num">11</span><span class="line-num"></span><span class="line-text">9,<span class="time">2026-10-27 20:47:07.276</span>,<span class="num">300.190</span>,<span class="c-volt">Voltage</span>,<span class="num">3.885</span>,V</span></div>
+    <div class="line-row"><span class="line-num">12</span><span class="line-num"></span><span class="line-text">10,<span class="time">2026-10-27 20:47:07.276</span>,<span class="num">300.270</span>,<span class="c-vib">Vibration</span>,<span class="num">0.115</span>,g</span></div>
+    <div class="line-row"><span class="line-num">13</span><span class="line-num"></span><span class="line-text">11,<span class="time">2026-10-27 20:47:07.326</span>,<span class="num">350.150</span>,<span class="c-vib">Vibration</span>,<span class="num">-0.380</span>,g</span></div>
+    <div class="line-row"><span class="line-num">14</span><span class="line-num"></span><span class="line-text">12,<span class="time">2026-10-27 20:47:07.376</span>,<span class="num">400.110</span>,<span class="c-press">Pressure</span>,<span class="num">101.410</span>,kPa</span></div>
+    <div class="line-row"><span class="line-num">15</span><span class="line-num"></span><span class="line-text">13,<span class="time">2026-10-27 20:47:07.376</span>,<span class="num">400.250</span>,<span class="c-volt">Voltage</span>,<span class="num">3.990</span>,V</span></div>
+    <div class="line-row"><span class="line-num">16</span><span class="line-num"></span><span class="line-text">14,<span class="time">2026-10-27 20:47:07.376</span>,<span class="num">400.320</span>,<span class="c-vib">Vibration</span>,<span class="num">0.050</span>,g</span></div>
+    <div class="line-row"><span class="line-num">17</span><span class="line-num"></span><span class="line-text">15,<span class="time">2026-10-27 20:47:07.426</span>,<span class="num">450.280</span>,<span class="c-vib">Vibration</span>,<span class="num">0.290</span>,g</span></div>
+    <div class="line-row"><span class="line-num">18</span><span class="line-num"></span><span class="line-text">16,<span class="time">2026-10-27 20:47:07.476</span>,<span class="num">500.080</span>,<span class="c-temp">Temperature</span>,<span class="num">25.045</span>,C</span></div>
+    <div class="line-row"><span class="line-num">19</span><span class="line-num"></span><span class="line-text">17,<span class="time">2026-10-27 20:47:07.476</span>,<span class="num">500.180</span>,<span class="c-volt">Voltage</span>,<span class="num">4.015</span>,V</span></div>
+    <div class="line-row"><span class="line-num">20</span><span class="line-num"></span><span class="line-text">18,<span class="time">2026-10-27 20:47:07.476</span>,<span class="num">500.290</span>,<span class="c-vib">Vibration</span>,<span class="num">-0.190</span>,g</span></div>
+    <div class="line-row"><span class="line-num">21</span><span class="line-num"></span><span class="line-text">19,<span class="time">2026-10-27 20:47:07.526</span>,<span class="num">550.140</span>,<span class="c-vib">Vibration</span>,<span class="num">-0.420</span>,g</span></div>
+    <div class="line-row"><span class="line-num">22</span><span class="line-num"></span><span class="line-text">20,<span class="time">2026-10-27 20:47:07.576</span>,<span class="num">600.090</span>,<span class="c-press">Pressure</span>,<span class="num">101.450</span>,kPa</span></div>
+    <div class="line-row"><span class="line-num">23</span><span class="line-num"></span><span class="line-text">21,<span class="time">2026-10-27 20:47:07.576</span>,<span class="num">600.220</span>,<span class="c-volt">Voltage</span>,<span class="num">3.955</span>,V</span></div>
+    <div class="line-row"><span class="line-num">24</span><span class="line-num"></span><span class="line-text">22,<span class="time">2026-10-27 20:47:07.576</span>,<span class="num">600.350</span>,<span class="c-vib">Vibration</span>,<span class="num">0.310</span>,g</span></div>
+  </div>
+
+  <div class="statusbar">
+    <div class="status-item">
+      <span>File: <b>daq_log.csv</b></span>
+      <span>Lines: <b>5,021</b></span>
+      <span>Channels Logged: <b>4 (All Interleaved)</b></span>
+      <span>Watermark Buffer: <b>100 ms PriorityQueue</b></span>
+    </div>
+    <div>ATHISH M (711525BEC014) · Project 35 · Mini Project Output Verification</div>
+  </div>
+</div>
+
+</body>
+</html>
